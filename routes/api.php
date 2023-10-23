@@ -22,6 +22,111 @@ use Illuminate\Support\Facades\DB;
 
 */
 
+
+// ! === Audit
+
+Route::get("/v1/audit", function() {
+    $dbAudit = DB::table("audit")->get();
+    if ($dbAudit == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get audit",
+            "data" => $dbAudit
+        ], 200);
+    }
+});
+
+Route::get("/v1/audit/{id}", function (Request $request, $id) {
+    $dbAudit = DB::table("audit")->where("id", $id)->get();
+
+    if($dbAudit == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get audit by id",
+            "data" => $dbAudit
+        ], 200);
+    }
+});
+
+Route::post("/v1/audit/create", function (Request $request) {
+    $dbAudit = DB::table("audit")->insert([
+        "activity_name" => $request->input("activity_name"),
+        "table_name" => $request->input("table_name"),
+        "user_id" => $request->input("user_id")
+    ]);
+
+    if($dbAudit == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create audit",
+        ], 201);
+    }
+});
+
+Route::put("/v1/audit-update/{id}", function (Request $request, $id) {
+    $dbAudit = DB::table("audit")->where("id", $id)->update([
+        "activity_name" => $request->input("activity_name"),
+        "table_name"=> $request->input("talbe_name"),
+        "user_id"=> $request->input("user_id")
+    ]);
+
+    if($dbAudit == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Sucessfully get audit"
+        ], 200);
+    }
+});
+
+Route::delete("/v1/audit-delete/{id}", function (Request $request, $id) {
+    $dbAudit = DB::table("audit")->delete($id);
+
+    if($dbAudit == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete audit"
+        ], 200);
+    }
+});
+
+// ! Audit ===
+
+
 // ! ==== Complain
 
 Route::get("/v1/complain", function () {
@@ -125,111 +230,112 @@ Route::delete("/v1/complain-delete/{id}", function (Request $request, $id) {
 
 
 
-// ? ==== Table Order
 
-Route::get("/v1/table_order", function () {
-    $dbTable = DB::table("table_order")->get();
-    if ($dbTable == null) {
+// ! === Order Transaction
+
+Route::get("/v1/order-transaction", function() {
+    $dbOrderTransaction = DB::table("order_transaction")->get();
+    if($dbOrderTransaction == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "Something Went Wrong"
+            "message" => "Something went wrong"
         ], 400);
     } else {
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => "Successfully Get Table",
-            "data" => $dbTable
+            "message" => "Successfully get order transaction",
+            "data" => $dbOrderTransaction
         ], 200);
     }
 });
 
-Route::post("/v1/table_order/create", function (Request $request) {
-    $dbTable = DB::table("table_order")->insert([
-        "name" => $request->input("name"),
-    ]);
-
-    if ($dbTable == null) {
+Route::get("/v1/order-transaction/{id}", function (Request $request, $id) {
+    $dbOrderTransaction = DB::table("order_transaction")->where("id", $id)->get();
+    if($dbOrderTransaction == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "Something Went Wrong"
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get order transaction by id",
+            "data" => $dbOrderTransaction
+        ], 200);
+    }
+});
+
+Route::post("/v1/order-transaction/create", function (Request $request) {
+    $dbOrderTransaction = DB::table("order_transaction")->insert([
+        "order_list" => $request->input("order_list"),
+        "total_price" => $request->input("total_price"),
+        "status_order" => $request->input("status_order"),
+        "type" => $request->input("type"),
+        "table_id" => $request->input("table_id")
+    ]);
+
+    if($dbOrderTransaction == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
         ], 400);
     } else {
         return response()->json([
             "status" => 201,
             "error" => false,
-            "message" => "Successfully Create Table",
+            "message" => "Successfully create order transaction"
         ], 201);
     }
+
 });
 
-Route::get("/v1/table_order/{id}", function (Request $request, $id) {
-    $dbTable = DB::table("table_order")->where("id", $id)->get();
-    if ($dbTable == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Detail Table",
-            "data" => $dbTable
-        ], 200);
-    }
-});
-
-
-Route::put("/v1/table-update/{id}", function (Request $request, $id) {
-    $dbTable = DB::table("table_order")->where("id", $id)->update([
-        "name" => $request->input("name"),
+Route::put("/v1/order-transaction-update/{id}", function (Request $request, $id) {
+    $dbOrderTransaction = DB::table("order_transaction")->where("id", $id)->update([
+        "order_list" => $request->input("order_list"),
+        "total_price" => $request->input("total_price"),
+        "status_order" => $request->input("status_order"),
+        "type" => $request->input("type"),
+        "table_id" => $request->input("table_id")
     ]);
-    if ($dbTable == null) {
+
+    if($dbOrderTransaction == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "Something Went Wrong"
+            "message" => "Something went wrong"
         ], 400);
     } else {
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => "Successfully Update Table Order",
+            "message" => "Successfully update order transaction"
         ], 200);
     }
 });
 
-Route::delete("/v1/table-delete/{id}", function (Request $request, $id) {
-    $dbTable = DB::table("table_order")->delete($id);
-    if ($dbTable == null) {
+Route::delete("/v1/order-transaction-delete/{id}", function(Request $request, $id) {
+    $dbOrderTransaction = DB::table("order_transaction")->delete($id);
+    if($dbOrderTransaction == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "Something Went Wrong"
+            "message" => "Something went wrong"
         ], 400);
     } else {
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => "Successfully Delete Table Order",
+            "message" => "Successfully delete order transaction"
         ], 200);
     }
 });
 
-// ? ==== Table Order
-
-
-
-// ! ==== Staff Call
-
-
-
-// ! ==== Staff Call
-
+// ! Order Transaction ===
 
 
 // ? ==== Restaurant Detail
@@ -252,12 +358,332 @@ Route::get("/v1/restaurant", function () {
     }
 });
 
-Route::post("/v1/table_order/create", function (Request $request) {
-    $dbResto = DB::table("table_order")->insert([
-        "name" => $request->input("name"),
+Route::post("/v1/restaurant/create", function (Request $request) {
+    $dbResto = DB::table("restaurant_detail")->insert([
+        "setting_name" => $request->input("setting_name"),
+        "open_hour" => $request->input("open_hour"),
+        "closed_hour" => $request->input("closed_hour"),
+        "location" => $request->input("location"),
+        "description" => $request->input("description"),
+        "logo" => $request->input("logo"),
     ]);
 
     if ($dbResto == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully Create Restaurant Detail",
+        ], 201);
+    }
+});
+
+Route::get("/v1/restaurant/{setting_name}", function (Request $request, $setting_name) {
+    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->get();
+    if ($dbResto == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Restaurant Detail",
+            "data" => $dbResto
+        ], 200);
+    }
+});
+
+
+Route::put("/v1/restaurant-update/{setting_name}", function (Request $request, $setting_name) {
+    $dbTable = DB::table("restaurant_detail")->where("setting_name", $setting_name)->update([
+        "setting_name" => $request->input("setting_name"),
+        "open_hour" => $request->input("open_hour"),
+        "closed_hour" => $request->input("closed_hour"),
+        "location" => $request->input("location"),
+        "description" => $request->input("description"),
+        "logo" => $request->input("logo"),
+    ]);
+    if ($dbTable == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Update Restaurant Detail",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/restaurant-delete/{setting_name}", function (Request $request, $setting_name) {
+    $dbResto = DB::table("restaurant_detail")->delete($setting_name);
+    if ($dbResto == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Delete Table Order",
+        ], 200);
+    }
+});
+
+// ? ==== Restaurant Detail
+
+
+// ! === Snack
+
+Route::get("/v1/snack", function() {
+    $dbSnack = DB::table("snack")->get();
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get snacks",
+            "data" => $dbSnack
+        ], 200);
+    }
+});
+
+Route::get("/v1/snack/{id}", function(Request $request, $id) {
+    $dbSnack = DB::table("snack")->where("id", $id)->get();
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get snack by id",
+            "data" => $dbSnack
+        ], 200);
+    }
+});
+
+Route::post("/v1/snack/create", function (Request $request) {
+    $dbSnack = DB::table("snack")->insert([
+        "name" => $request->input("name"),
+        "price" => $request->input("price"),
+        "desciption" => $request->input("description"),
+        "rating" => $request->input("rating"),
+        "image_name" => $request->input("image_name"),
+        "user_id" => $request->input("user_id"),
+        "is_active" => $request->input("is_active"),
+        "most_popular" => $request->input("most_popular")
+    ]);
+
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create snack",
+        ], 201);
+    }
+});
+
+Route::put("/v1/snack-update/{id}", function (Request $request, $id) {
+    $dbSnack = DB::table("snack")->where("id", $id)->update([
+        "name" => $request->input("name"),
+        "price" => $request->input("price"),
+        "desciption" => $request->input("description"),
+        "rating" => $request->input("rating"),
+        "image_name" => $request->input("image_name"),
+        "user_id" => $request->input("user_id"),
+        "is_active" => $request->input("is_active"),
+        "most_popular" => $request->input("most_popular")
+    ]);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully update snack",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/snack-delete/{id}", function (Request $request, $id) {
+    $dbSnack = DB::table("snack")->delete($id);
+
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete snack",
+        ], 200);
+    }
+});
+
+// ! Snack ===
+
+
+// ! ==== Staff Call
+
+Route::get("/v1/staff-call", function () {
+    $dbStaff = DB::table("staff_call")->get();
+    if ($dbStaff == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Message",
+            "data" => $dbStaff
+        ], 200);
+    }
+});
+
+Route::post("/v1/staff-call/create", function (Request $request) {
+    $dbStaff = DB::table("staff_call")->insert([
+        "table_id" => $request->input("table_id"),
+        "message" => $request->input("message"),
+    ]);
+
+    if ($dbStaff == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully Create Message to Staff",
+        ], 201);
+    }
+});
+
+Route::get("/v1/staff-call/{id}", function (Request $request, $id) {
+    $dbStaff = DB::table("staff_call")->where("id", $id)->get();
+    if ($dbStaff == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Detail Message",
+            "data" => $dbStaff
+        ], 200);
+    }
+});
+
+Route::put("/v1/staff-call/{id}", function (Request $request, $id) {
+    $dbTable = DB::table("staff_call")->where("id", $id)->update([
+        "table_id" => $request->input("table_id"),
+        "message" => $request->input("message"),
+    ]);
+    if ($dbTable == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Update Message to Staff",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/staff-delete/{id}", function (Request $request, $id) {
+    $dbTable = DB::table("staff_call")->delete($id);
+    if ($dbTable == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Delete Message to Staff",
+        ], 200);
+    }
+});
+
+// ! ==== Staff Call
+
+
+// ? ==== Table Order
+
+Route::get("/v1/table-order", function () {
+    $dbTable = DB::table("table_order")->get();
+    if ($dbTable == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Table",
+            "data" => $dbTable
+        ], 200);
+    }
+});
+
+Route::post("/v1/table-order/create", function (Request $request) {
+    $dbTable = DB::table("table_order")->insert([
+        "name" => $request->input("name"),
+    ]);
+
+    if ($dbTable == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
@@ -272,7 +698,7 @@ Route::post("/v1/table_order/create", function (Request $request) {
     }
 });
 
-Route::get("/v1/table_order/{id}", function (Request $request, $id) {
+Route::get("/v1/table-order/{id}", function (Request $request, $id) {
     $dbTable = DB::table("table_order")->where("id", $id)->get();
     if ($dbTable == null) {
         return response()->json([
@@ -327,4 +753,214 @@ Route::delete("/v1/table-delete/{id}", function (Request $request, $id) {
     }
 });
 
-// ? ==== Restaurant Detail
+// ? ==== Table Order
+
+
+// ! === Transaction History
+
+Route::get("/v1/transaction-history", function() {
+    $dbTransactionHistory = DB::table("transaction_history")->get();
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get transaction history",
+            "data" => $dbTransactionHistory
+        ], 200);
+    }
+});
+
+Route::get("/v1/transaction-history/{id}", function(Request $request, $id) {
+    $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->get();
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get transaction history by id",
+            "data" => $dbTransactionHistory
+        ], 200);
+    }
+});
+
+Route::post("/v1/transaction-history/create", function (Request $request) {
+    $dbTransactionHistory = DB::table("transaction_history")->insert([
+        "trx_id" => $request->input("trx_id"),
+        "order_id" => $request->input("order_id"),
+        "total_price" => $request->input("total_price")
+    ]);
+
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create transaction history",
+        ], 201);
+    }
+});
+
+Route::put("/v1/transaction-history-update/{id}", function (Request $request, $id) {
+    $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->update([
+        "trx_id" => $request->input("trx_id"),
+        "order_id" => $request->input("order_id"),
+        "total_price" => $request->input("total_price")
+    ]);
+
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully update transaction history",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/transaction-history-delete/{id}", function (Request $request, $id) {
+    $dbTransactionHistory = DB::table("transaction_history")->delete($id);
+
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete transaction history",
+        ], 200);
+    }
+});
+
+// ! Trasacntion History ===
+
+
+// ! === Users 
+
+Route::get("/v1/users", function() {
+    $dbUsers = DB::table("users")->get();
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get users",
+            "data" => $dbUsers
+        ], 200);
+    }
+});
+
+Route::get("/v1/user/{id}", function(Request $request, $id) {
+    $dbUsers = DB::table("users")->where("id", $id)->get();
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get user by id",
+            "data" => $dbUsers
+        ], 200);
+    }
+});
+
+Route::post("/v1/user/create", function (Request $request) {
+    $dbUsers = DB::table("users")->insert([
+        "name" => $request->input("name"),
+        "username" => $request->input("username"),
+        "password" => $request->input("password"),
+        "role" => $request->input("role")
+    ]);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create user",
+        ], 201);
+    }
+});
+
+Route::put("/v1/user-update/{id}", function (Request $request, $id) {
+    $dbUsers = DB::table("users")->where("id", $id)->update([
+        "name" => $request->input("name"),
+        "username" => $request->input("username"),
+        "password" => $request->input("password"),
+        "role" => $request->input("role")
+    ]);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully update user",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/user-delete/{id}", function (Request $request, $id) {
+    $dbUsers = DB::table("users")->delete($id);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete user",
+        ], 200);
+    }
+});
+
+// ! Users ===
+
+
