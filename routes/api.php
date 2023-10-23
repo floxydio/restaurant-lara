@@ -127,6 +127,106 @@ Route::delete("/v1/audit-delete/{id}", function (Request $request, $id) {
 // ! Audit ===
 
 
+// ! ==== Complain
+
+Route::get("/v1/complain", function () {
+    $dbComplain = DB::table("complain")->get();
+    if ($dbComplain == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Complain",
+            "data" => $dbComplain
+        ], 200);
+    }
+});
+
+Route::post("/v1/complain/create", function (Request $request) {
+    $dbComplain = DB::table("complain")->insert([
+        "name" => $request->input("name"),
+        "message" => $request->input("message")
+    ]);
+
+    if ($dbComplain == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully Create Complain",
+        ], 201);
+    }
+});
+
+Route::get("/v1/complain/{id}", function (Request $request, $id) {
+    $dbComplain = DB::table("complain")->where("id", $id)->get();
+    if ($dbComplain == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Complain",
+            "data" => $dbComplain
+        ], 200);
+    }
+});
+
+
+Route::put("/v1/complain-update/{id}", function (Request $request, $id) {
+    $dbComplain = DB::table("complain")->where("id", $id)->update([
+        "name" => $request->input("name"),
+        "message" => $request->input("message")
+    ]);
+    if ($dbComplain == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Update Complain",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/complain-delete/{id}", function (Request $request, $id) {
+    $dbComplain = DB::table("complain")->delete($id);
+    if ($dbComplain == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Delete Complain",
+        ], 200);
+    }
+});
+
+// ! ==== Complain
+
+
 // ! === Order Transaction
 
 Route::get("/v1/order-transaction", function() {
@@ -232,106 +332,6 @@ Route::delete("/v1/order-transaction-delete/{id}", function(Request $request, $i
 });
 
 // ! Order Transaction ===
-
-
-// ! ==== Complain
-
-Route::get("/v1/complain", function () {
-    $dbComplain = DB::table("complain")->get();
-    if ($dbComplain == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Complain",
-            "data" => $dbComplain
-        ], 200);
-    }
-});
-
-Route::post("/v1/complain/create", function (Request $request) {
-    $dbComplain = DB::table("complain")->insert([
-        "name" => $request->input("name"),
-        "message" => $request->input("message")
-    ]);
-
-    if ($dbComplain == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 201,
-            "error" => false,
-            "message" => "Successfully Create Complain",
-        ], 201);
-    }
-});
-
-Route::get("/v1/complain/{id}", function (Request $request, $id) {
-    $dbComplain = DB::table("complain")->where("id", $id)->get();
-    if ($dbComplain == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Complain",
-            "data" => $dbComplain
-        ], 200);
-    }
-});
-
-
-Route::put("/v1/complain-update/{id}", function (Request $request, $id) {
-    $dbComplain = DB::table("complain")->where("id", $id)->update([
-        "name" => $request->input("name"),
-        "message" => $request->input("message")
-    ]);
-    if ($dbComplain == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Update Complain",
-        ], 200);
-    }
-});
-
-Route::delete("/v1/complain-delete/{id}", function (Request $request, $id) {
-    $dbComplain = DB::table("complain")->delete($id);
-    if ($dbComplain == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Delete Complain",
-        ], 200);
-    }
-});
-
-// ! ==== Complain
 
 
 // ? ==== Restaurant Detail
