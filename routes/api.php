@@ -716,7 +716,7 @@ Route::put("/v1/transaction-history-update/{id}", function (Request $request, $i
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => "Successfully create transaction history",
+            "message" => "Successfully update transaction history",
         ], 200);
     }
 });
@@ -742,5 +742,108 @@ Route::delete("/v1/transaction-history-delete/{id}", function (Request $request,
 // ! Trasacntion History ===
 
 
+// ! === Users 
+
+Route::get("/v1/users", function() {
+    $dbUsers = DB::table("users")->get();
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get users",
+            "data" => $dbUsers
+        ], 200);
+    }
+});
+
+Route::get("/v1/user/{id}", function(Request $request, $id) {
+    $dbUsers = DB::table("users")->where("id", $id)->get();
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get user by id",
+            "data" => $dbUsers
+        ], 200);
+    }
+});
+
+Route::post("/v1/user/create", function (Request $request) {
+    $dbUsers = DB::table("users")->insert([
+        "name" => $request->input("name"),
+        "username" => $request->input("username"),
+        "password" => $request->input("password"),
+        "role" => $request->input("role")
+    ]);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create user",
+        ], 201);
+    }
+});
+
+Route::put("/v1/user-update/{id}", function (Request $request, $id) {
+    $dbUsers = DB::table("users")->where("id", $id)->update([
+        "name" => $request->input("name"),
+        "username" => $request->input("username"),
+        "password" => $request->input("password"),
+        "role" => $request->input("role")
+    ]);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully update user",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/user-delete/{id}", function (Request $request, $id) {
+    $dbUsers = DB::table("users")->delete($id);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete user",
+        ], 200);
+    }
+});
+
+// ! Users ===
 
 
