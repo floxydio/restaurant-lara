@@ -639,7 +639,107 @@ Route::delete("/v1/table-delete/{id}", function (Request $request, $id) {
 // ? ==== Table Order
 
 
+// ! === Transaction History
 
+Route::get("/v1/transaction-history", function() {
+    $dbTransactionHistory = DB::table("transaction_history")->get();
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get transaction history",
+            "data" => $dbTransactionHistory
+        ], 200);
+    }
+});
+
+Route::get("/v1/transaction-history/{id}", function(Request $request, $id) {
+    $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->get();
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get transaction history by id",
+            "data" => $dbTransactionHistory
+        ], 200);
+    }
+});
+
+Route::post("/v1/transaction-history/create", function (Request $request) {
+    $dbTransactionHistory = DB::table("transaction_history")->insert([
+        "trx_id" => $request->input("trx_id"),
+        "order_id" => $request->input("order_id"),
+        "total_price" => $request->input("total_price")
+    ]);
+
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create transaction history",
+        ], 201);
+    }
+});
+
+Route::put("/v1/transaction-history-update/{id}", function (Request $request, $id) {
+    $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->update([
+        "trx_id" => $request->input("trx_id"),
+        "order_id" => $request->input("order_id"),
+        "total_price" => $request->input("total_price")
+    ]);
+
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully create transaction history",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/transaction-history-delete/{id}", function (Request $request, $id) {
+    $dbTransactionHistory = DB::table("transaction_history")->delete($id);
+
+    if ($dbTransactionHistory == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete transaction history",
+        ], 200);
+    }
+});
+
+// ! Trasacntion History ===
 
 
 
