@@ -442,6 +442,119 @@ Route::delete("/v1/restaurant-delete/{setting_name}", function (Request $request
 // ? ==== Restaurant Detail
 
 
+// ! === Snack
+
+Route::get("/v1/snack", function() {
+    $dbSnack = DB::table("snack")->get();
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get snacks",
+            "data" => $dbSnack
+        ], 200);
+    }
+});
+
+Route::get("/v1/snack/{id}", function(Request $request, $id) {
+    $dbSnack = DB::table("snack")->where("id", $id)->get();
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully get snack by id",
+            "data" => $dbSnack
+        ], 200);
+    }
+});
+
+Route::post("/v1/snack/create", function (Request $request) {
+    $dbSnack = DB::table("snack")->insert([
+        "name" => $request->input("name"),
+        "price" => $request->input("price"),
+        "desciption" => $request->input("description"),
+        "rating" => $request->input("rating"),
+        "image_name" => $request->input("image_name"),
+        "user_id" => $request->input("user_id"),
+        "is_active" => $request->input("is_active"),
+        "most_popular" => $request->input("most_popular")
+    ]);
+
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 201,
+            "error" => false,
+            "message" => "Successfully create snack",
+        ], 201);
+    }
+});
+
+Route::put("/v1/snack-update/{id}", function (Request $request, $id) {
+    $dbSnack = DB::table("snack")->where("id", $id)->update([
+        "name" => $request->input("name"),
+        "price" => $request->input("price"),
+        "desciption" => $request->input("description"),
+        "rating" => $request->input("rating"),
+        "image_name" => $request->input("image_name"),
+        "user_id" => $request->input("user_id"),
+        "is_active" => $request->input("is_active"),
+        "most_popular" => $request->input("most_popular")
+    ]);
+
+    if ($dbUsers == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully update snack",
+        ], 200);
+    }
+});
+
+Route::delete("/v1/snack-delete/{id}", function (Request $request, $id) {
+    $dbSnack = DB::table("snack")->delete($id);
+
+    if ($dbSnack == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something went wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully delete snack",
+        ], 200);
+    }
+});
+
+// ! Snack ===
+
+
 // ! ==== Staff Call
 
 Route::get("/v1/staff-call", function () {
