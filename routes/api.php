@@ -225,8 +225,37 @@ Route::delete("/v1/complain-delete/{id}", function (Request $request, $id) {
 });
 
 // ! ==== Complain
+Route::get("/v1/complain/{id}", function (Request $request, $id) {
+    $dbComplain = DB::table("complain")->where("id", $id)->get();
+    if ($dbComplain == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Complain",
+            "data" => $dbComplain
+        ], 200);
+    }
+});
 
+// ! ==== drink 
 
+Route::get("/v1/drink/{id}", function (Request $request, $id) {
+    $dbdrink = DB::table("drink")->where("id", $id)-> get();
+    if ($dbdrink == null) {
+        return response ()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => " something went wrong",
+        ],400);
+    }
+
+});
 
 
 
