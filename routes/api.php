@@ -84,10 +84,10 @@ Route::post("/v1/audit/create", function (Request $request) {
     }
 });
 
-Route::put("/v1/audit-update/{id}", function (Request $request, $id) {
+Route::post("/v1/audit-update/{id}", function (Request $request, $id) {
     $dbAudit = DB::table("audit")->where("id", $id)->update([
         "activity_name" => $request->input("activity_name"),
-        "table_name" => $request->input("talbe_name"),
+        "table_name" => $request->input("table_name"),
         "user_id" => $request->input("user_id")
     ]);
 
@@ -101,7 +101,7 @@ Route::put("/v1/audit-update/{id}", function (Request $request, $id) {
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => "Sucessfully get audit"
+            "message" => "Sucessfully update audit"
         ], 200);
     }
 });
@@ -187,7 +187,7 @@ Route::get("/v1/complain/{id}", function (Request $request, $id) {
 });
 
 
-Route::put("/v1/complain-update/{id}", function (Request $request, $id) {
+Route::post("/v1/complain-update/{id}", function (Request $request, $id) {
     $dbComplain = DB::table("complain")->where("id", $id)->update([
         "name" => $request->input("name"),
         "message" => $request->input("message")
@@ -596,7 +596,7 @@ Route::post("/v1/order-transaction/create", function (Request $request) {
     }
 });
 
-Route::put("/v1/order-transaction-update/{id}", function (Request $request, $id) {
+Route::post("/v1/order-transaction-update/{id}", function (Request $request, $id) {
     $dbOrderTransaction = DB::table("order_transaction")->where("id", $id)->update([
         "order_list" => $request->input("order_list"),
         "total_price" => $request->input("total_price"),
@@ -712,9 +712,7 @@ Route::get("/v1/restaurant/{setting_name}", function (Request $request, $setting
     }
 });
 
-
-// Update belum
-Route::put("/v1/restaurant-update/{setting_name}", function (Request $request, $setting_name) {
+Route::post("/v1/restaurant-update/{setting_name}", function (Request $request, $setting_name) {
 
     $upload_path = base_path('./public');
     $extension = $request->file("logo")->getClientOriginalExtension();
@@ -789,12 +787,21 @@ Route::get("/v1/snack/{id}", function (Request $request, $id) {
 });
 
 Route::post("/v1/snack/create", function (Request $request) {
+
+    $upload_path = base_path('./public');
+    $extension = $request->file("image_name")->getClientOriginalExtension();
+    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    $request->file("image_name")->move(
+        $upload_path . '/uploads/',
+        $fileNameToStore
+    );
+
     $dbSnack = DB::table("snack")->insert([
         "name" => $request->input("name"),
         "price" => $request->input("price"),
         "description" => $request->input("description"),
         "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
+        "image_name" => $fileNameToStore,
         "user_id" => $request->input("user_id"),
         "is_active" => $request->input("is_active"),
         "most_popular" => $request->input("most_popular")
@@ -815,13 +822,22 @@ Route::post("/v1/snack/create", function (Request $request) {
     }
 });
 
-Route::put("/v1/snack-update/{id}", function (Request $request, $id) {
+Route::post("/v1/snack-update/{id}", function (Request $request, $id) {
+
+    $upload_path = base_path('./public');
+    $extension = $request->file("image_name")->getClientOriginalExtension();
+    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    $request->file("image_name")->move(
+        $upload_path . '/uploads/',
+        $fileNameToStore
+    );
+
     $dbSnack = DB::table("snack")->where("id", $id)->update([
         "name" => $request->input("name"),
         "price" => $request->input("price"),
         "desciption" => $request->input("description"),
         "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
+        "image_name" => $fileNameToStore,
         "user_id" => $request->input("user_id"),
         "is_active" => $request->input("is_active"),
         "most_popular" => $request->input("most_popular")
@@ -922,7 +938,7 @@ Route::get("/v1/staff-call/{id}", function (Request $request, $id) {
     }
 });
 
-Route::put("/v1/staff-call/{id}", function (Request $request, $id) {
+Route::post("/v1/staff-call/{id}", function (Request $request, $id) {
     $dbTable = DB::table("staff_call")->where("id", $id)->update([
         "table_id" => $request->input("table_id"),
         "message" => $request->input("message"),
@@ -1021,7 +1037,7 @@ Route::get("/v1/table-order/{id}", function (Request $request, $id) {
 });
 
 
-Route::put("/v1/table-update/{id}", function (Request $request, $id) {
+Route::post("/v1/table-update/{id}", function (Request $request, $id) {
     $dbTable = DB::table("table_order")->where("id", $id)->update([
         "name" => $request->input("name"),
     ]);
@@ -1120,7 +1136,7 @@ Route::post("/v1/transaction-history/create", function (Request $request) {
     }
 });
 
-Route::put("/v1/transaction-history-update/{id}", function (Request $request, $id) {
+Route::post("/v1/transaction-history-update/{id}", function (Request $request, $id) {
     $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->update([
         "trx_id" => $request->input("trx_id"),
         "order_id" => $request->input("order_id"),
@@ -1224,7 +1240,7 @@ Route::post("/v1/user/create", function (Request $request) {
     }
 });
 
-Route::put("/v1/user-update/{id}", function (Request $request, $id) {
+Route::post("/v1/user-update/{id}", function (Request $request, $id) {
     $dbUsers = DB::table("users")->where("id", $id)->update([
         "name" => $request->input("name"),
         "username" => $request->input("username"),
