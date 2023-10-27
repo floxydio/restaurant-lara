@@ -87,7 +87,7 @@ Route::post("/v1/audit/create", function (Request $request) {
 Route::put("/v1/audit-update/{id}", function (Request $request, $id) {
     $dbAudit = DB::table("audit")->where("id", $id)->update([
         "activity_name" => $request->input("activity_name"),
-        "table_name" => $request->input("talbe_name"),
+        "table_name" => $request->input("table_name"),
         "user_id" => $request->input("user_id")
     ]);
 
@@ -482,12 +482,21 @@ Route::get("/v1/snack/{id}", function (Request $request, $id) {
 });
 
 Route::post("/v1/snack/create", function (Request $request) {
+
+    $upload_path = base_path('./public');
+    $extension = $request->file("image_name")->getClientOriginalExtension();
+    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    $request->file("image_name")->move(
+        $upload_path . '/uploads/',
+        $fileNameToStore
+    );
+
     $dbSnack = DB::table("snack")->insert([
         "name" => $request->input("name"),
         "price" => $request->input("price"),
-        "desciption" => $request->input("description"),
+        "description" => $request->input("description"),
         "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
+        "image_name" => $fileNameToStore,
         "user_id" => $request->input("user_id"),
         "is_active" => $request->input("is_active"),
         "most_popular" => $request->input("most_popular")
@@ -509,12 +518,21 @@ Route::post("/v1/snack/create", function (Request $request) {
 });
 
 Route::put("/v1/snack-update/{id}", function (Request $request, $id) {
+
+    $upload_path = base_path('./public');
+    $extension = $request->file("image_name")->getClientOriginalExtension();
+    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    $request->file("image_name")->move(
+        $upload_path . '/uploads/',
+        $fileNameToStore
+    );
+
     $dbSnack = DB::table("snack")->where("id", $id)->update([
         "name" => $request->input("name"),
         "price" => $request->input("price"),
         "desciption" => $request->input("description"),
         "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
+        "image_name" => $fileNameToStore,
         "user_id" => $request->input("user_id"),
         "is_active" => $request->input("is_active"),
         "most_popular" => $request->input("most_popular")
