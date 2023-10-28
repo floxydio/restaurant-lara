@@ -710,37 +710,16 @@ Route::post("/v1/restaurant/create", function (Request $request) {
     }
 });
 
-Route::get("/v1/restaurant/{setting_name}", function (Request $request, $setting_name) {
-    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->get();
-    if ($dbResto == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Restaurant Detail",
-            "data" => $dbResto
-        ], 200);
-    }
-});
-
 Route::post("/v1/restaurant-update/{setting_name}", function (Request $request, $setting_name) {
 
     $project = DB::table("restaurant_detail")->where("setting_name", $setting_name)->first();
 
     $image_path = public_path("/uploads/logoResto/" . $project->logo);
 
-    // Check if the request has an image file
     if ($request->hasFile('logo')) {
         if (File::exists($image_path)) {
             File::delete($image_path);
         }
-
-
 
         $upload_path = base_path('./public');
         $extension = $request->file("logo")->getClientOriginalExtension();
@@ -929,6 +908,24 @@ Route::get("/v1/staff-call", function () {
     }
 });
 
+Route::get("/v1/staff-call/{id}", function (Request $request, $id) {
+    $dbStaff = DB::table("staff_call")->where("id", $id)->get();
+    if ($dbStaff == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Detail Message",
+            "data" => $dbStaff
+        ], 200);
+    }
+});
+
 Route::post("/v1/staff-call/create", function (Request $request) {
     $dbStaff = DB::table("staff_call")->insert([
         "table_id" => $request->input("table_id"),
@@ -947,24 +944,6 @@ Route::post("/v1/staff-call/create", function (Request $request) {
             "error" => false,
             "message" => "Successfully Create Message to Staff",
         ], 201);
-    }
-});
-
-Route::get("/v1/staff-call/{id}", function (Request $request, $id) {
-    $dbStaff = DB::table("staff_call")->where("id", $id)->get();
-    if ($dbStaff == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Detail Message",
-            "data" => $dbStaff
-        ], 200);
     }
 });
 
@@ -1028,6 +1007,24 @@ Route::get("/v1/table-order", function () {
     }
 });
 
+Route::get("/v1/table-order/{id}", function (Request $request, $id) {
+    $dbTable = DB::table("table_order")->where("id", $id)->get();
+    if ($dbTable == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Detail Table",
+            "data" => $dbTable
+        ], 200);
+    }
+});
+
 Route::post("/v1/table-order/create", function (Request $request) {
     $dbTable = DB::table("table_order")->insert([
         "name" => $request->input("name"),
@@ -1047,25 +1044,6 @@ Route::post("/v1/table-order/create", function (Request $request) {
         ], 201);
     }
 });
-
-Route::get("/v1/table-order/{id}", function (Request $request, $id) {
-    $dbTable = DB::table("table_order")->where("id", $id)->get();
-    if ($dbTable == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Detail Table",
-            "data" => $dbTable
-        ], 200);
-    }
-});
-
 
 Route::post("/v1/table-update/{id}", function (Request $request, $id) {
     $dbTable = DB::table("table_order")->where("id", $id)->update([
