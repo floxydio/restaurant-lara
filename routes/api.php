@@ -353,6 +353,24 @@ Route::get("/v1/restaurant", function () {
     }
 });
 
+Route::get("/v1/restaurant/{setting_name}", function (Request $request, $setting_name) {
+    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->get();
+    if ($dbResto == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "Something Went Wrong"
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "Successfully Get Restaurant Detail",
+            "data" => $dbResto
+        ], 200);
+    }
+});
+
 Route::post("/v1/restaurant/create", function (Request $request) {
 
     $upload_path = base_path('./public');
@@ -387,28 +405,32 @@ Route::post("/v1/restaurant/create", function (Request $request) {
     }
 });
 
-Route::get("/v1/restaurant/{setting_name}", function (Request $request, $setting_name) {
-    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->get();
-    if ($dbResto == null) {
-        return response()->json([
-            "status" => 400,
-            "error" => true,
-            "message" => "Something Went Wrong"
-        ], 400);
-    } else {
-        return response()->json([
-            "status" => 200,
-            "error" => false,
-            "message" => "Successfully Get Restaurant Detail",
-            "data" => $dbResto
-        ], 200);
-    }
-});
-
-
 // Update belum
 Route::put("/v1/restaurant-update/{setting_name}", function (Request $request, $setting_name) {
 
+    // $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->get();
+
+    // if ($request->file != '') {
+    //     $path = public_path() . '/uploads/';
+
+    //     //code for remove old file
+    //     if ($dbResto->file != ''  && $dbResto->file != null) {
+    //         $file_old = $path . $dbResto->file;
+    //         unlink($file_old);
+    //     }
+
+    //     //upload new file
+    //     $file = $request->file;
+    //     $extension = $file->getClientOriginalExtension();
+    //     $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    //     $file->move($path, $fileNameToStore);
+
+    //     //for update in table
+    //     $dbResto->update(['file' => $fileNameToStore]);
+    // }
+
+
+    
     $upload_path = base_path('./public');
     $extension = $request->file("logo")->getClientOriginalExtension();
     $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
@@ -417,15 +439,16 @@ Route::put("/v1/restaurant-update/{setting_name}", function (Request $request, $
         $fileNameToStore
     );
 
-    $dbTable = DB::table("restaurant_detail")->where("setting_name", $setting_name)->update([
+    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->update([
         "setting_name" => $request->input("setting_name"),
         "open_hour" => $request->input("open_hour"),
         "closed_hour" => $request->input("closed_hour"),
         "location" => $request->input("location"),
         "description" => $request->input("description"),
-        "logo" => $fileNameToStore
+        "logo" => $fileNameToStore,
     ]);
-    if ($dbTable == null) {
+
+    if ($dbResto == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
