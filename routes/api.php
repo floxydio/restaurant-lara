@@ -25,7 +25,6 @@ use Illuminate\Support\Facades\File;
 
 
 // ! === Audit
-
 Route::get("/v1/audit", function () {
     $dbAudit = DB::table("audit")->get();
     if ($dbAudit == null) {
@@ -45,7 +44,7 @@ Route::get("/v1/audit", function () {
 });
 
 Route::get("/v1/audit/{id}", function (Request $request, $id) {
-    $dbAudit = DB::table("audit")->where("id", $id)->get();
+    $dbAudit = DB::table("audit")->where("id", $id)->first();
 
     if ($dbAudit == null) {
         return response()->json([
@@ -124,12 +123,10 @@ Route::delete("/v1/audit-delete/{id}", function (Request $request, $id) {
         ], 200);
     }
 });
-
 // ! Audit ===
 
 
 // ! ==== Complain
-
 Route::get("/v1/complain", function () {
     $dbComplain = DB::table("complain")->get();
     if ($dbComplain == null) {
@@ -170,7 +167,7 @@ Route::post("/v1/complain/create", function (Request $request) {
 });
 
 Route::get("/v1/complain/{id}", function (Request $request, $id) {
-    $dbComplain = DB::table("complain")->where("id", $id)->get();
+    $dbComplain = DB::table("complain")->where("id", $id)->first();
     if ($dbComplain == null) {
         return response()->json([
             "status" => 400,
@@ -186,7 +183,6 @@ Route::get("/v1/complain/{id}", function (Request $request, $id) {
         ], 200);
     }
 });
-
 
 Route::post("/v1/complain-update/{id}", function (Request $request, $id) {
     $dbComplain = DB::table("complain")->where("id", $id)->update([
@@ -224,30 +220,30 @@ Route::delete("/v1/complain-delete/{id}", function (Request $request, $id) {
         ], 200);
     }
 });
-
 // ! ==== Complain
-Route::get("/v1/complain/{id}", function (Request $request, $id) {
-    $dbComplain = DB::table("complain")->where("id", $id)->get();
-    if ($dbComplain == null) {
+
+
+// ! ==== Drink 
+Route::get("v1/drink", function () {
+    $dbmenu = DB::table("drink")->get();
+    if ($dbmenu == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "Something Went Wrong"
+            "message" => "something went wrong",
         ], 400);
     } else {
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => "Successfully Get Complain",
-            "data" => $dbComplain
+            "message" => "succesfully get drink",
+            "data" => $dbmenu
         ], 200);
     }
 });
 
-// ! ==== drink 
-/// -GET
 Route::get("/v1/drink/{id}", function (Request $request, $id) {
-    $dbdrink = DB::table("drink")->where("id", $id)->get();
+    $dbdrink = DB::table("drink")->where("id", $id)->first();
     if ($dbdrink == null) {
         return response()->json([
             "status" => 400,
@@ -264,15 +260,22 @@ Route::get("/v1/drink/{id}", function (Request $request, $id) {
     }
 });
 
-// -CREATED
-// masih ERROR 
-Route::post("v1/drink-create/created", function (request $request) {
+Route::post("v1/drink-create", function (request $request) {
+
+    $upload_path = base_path('./public');
+    $extension = $request->file("image_name")->getClientOriginalExtension();
+    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    $request->file("image_name")->move(
+        $upload_path . '/uploads/drink',
+        $fileNameToStore
+    );
+
     $dbdrink = DB::table("drink")->insert([
         "name" => $request->input("name"),
         "price" => $request->input("price"),
         "description" => $request->input("description"),
         "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
+        "image_name" => $fileNameToStore,
         "user_id" => $request->input("user_id"),
         "is_active" => $request->input("is_active"),
         "most_popular" => $request->input("most_popular")
@@ -291,38 +294,64 @@ Route::post("v1/drink-create/created", function (request $request) {
         ], 201);
     }
 });
-// - UPDATE
-route::put("/v1/drink-update/{id}", function (request $request, $id) {
-    $dbdrink = DB::table("drink")->where("id", $id)->update(
-        [
-            "name" => $request->input("name"),
-            "price" => $request->input("price"),
-            "description" => $request->input("description"),
-            "rating" => $request->input("rating"),
-            "image_name" => $request->input("image_name"),
-            "user_id" => $request->input("user_id"),
-            "is_active" => $request->input("is_active"),
-            "most_popular" => $request->input("most_populer"),
-        ]
-    );
+
+Route::post("/v1/drink-update/{id}", function (request $request, $id) {
+    $project = DB::table("drink")->where("id", $id)->first();
+
+    $image_path = public_path("/uploads/drink/" . $project->image_name);
+
+    if ($request->hasFile('image_name')) {
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        }
+
+        $upload_path = base_path('./public');
+        $extension = $request->file("image_name")->getClientOriginalExtension();
+        $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+        $request->file("image_name")->move(
+            $upload_path . '/uploads/drink',
+            $fileNameToStore
+        );
+
+        $dbdrink = DB::table("drink")->where("id", $id)->update(
+            [
+                "name" => $request->input("name"),
+                "price" => $request->input("price"),
+                "description" => $request->input("description"),
+                "rating" => $request->input("rating"),
+                "image_name" => $fileNameToStore,
+                "user_id" => $request->input("user_id"),
+                "is_active" => $request->input("is_active"),
+                "most_popular" => $request->input("most_popular"),
+            ]
+        );
+    }
     if ($dbdrink == null) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "something went ERROR",
+            "message" => "something went wrong",
         ], 400);
     } else {
         return response()->json([
             "status" => 200,
             "error" => false,
-            "message" => " succesfully terupdate"
+            "message" => "Succesfully updated"
         ]);
     }
 });
 
-// delete
-
 Route::delete("/v1/drink-delete/{id}", function (Request $request, $id) {
+    $project = DB::table("drink")->where("id", $id)->first();
+
+    $image_path = public_path("/uploads/drink/" . $project->image_name);
+
+    if ($project) {
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        }
+    }
+
     $dbdrink = DB::table("drink")->delete($id);
     if ($dbdrink == null) {
         return response()->json([
@@ -338,11 +367,29 @@ Route::delete("/v1/drink-delete/{id}", function (Request $request, $id) {
         ], 200);
     }
 });
-// ---- food
+// ! Drink
 
-//-- get
+// ? Food
+Route::get("v1/food", function () {
+    $dbmenu = DB::table("food")->get();
+    if ($dbmenu == null) {
+        return response()->json([
+            "status" => 400,
+            "error" => true,
+            "message" => "something went wrong",
+        ], 400);
+    } else {
+        return response()->json([
+            "status" => 200,
+            "error" => false,
+            "message" => "succesfully get food",
+            "data" => $dbmenu
+        ], 200);
+    }
+});
+
 Route::get("/v1/food/{id}", function (Request $request, $id) {
-    $dbfood = DB::table("food")->where("id", $id)->get();
+    $dbfood = DB::table("food")->where("id", $id)->first();
     if ($dbfood == null) {
         return response()->json([
             "status" => 400,
@@ -359,14 +406,22 @@ Route::get("/v1/food/{id}", function (Request $request, $id) {
     }
 });
 
-// post
-Route::post("/v1/food-create/created", function (Request $request) {
+Route::post("/v1/food-create", function (Request $request) {
+
+    $upload_path = base_path('./public');
+    $extension = $request->file("image_name")->getClientOriginalExtension();
+    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+    $request->file("image_name")->move(
+        $upload_path . '/uploads/food',
+        $fileNameToStore
+    );
+
     $dbfood = DB::table("food")->insert([
         "name" => $request->input("name"),
         "price" => $request->input("price"),
         "description" => $request->input("description"),
         "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
+        "image_name" => $fileNameToStore,
         "user_id" => $request->input("user_id"),
         "is_active" => $request->input("is_active"),
         "most_popular" => $request->input("most_populer", 0)
@@ -386,19 +441,36 @@ Route::post("/v1/food-create/created", function (Request $request) {
     }
 });
 
-// Updated
-Route::put("/v1/food-update/{id}", function (Request $request, $id) {
-    $dbfood = DB::table("food")->where("id", $id)->update([
-        "name" => $request->input("name"),
-        "price" => $request->input("price"),
-        "description" => $request->input("description"),
-        "rating" => $request->input("rating"),
-        "image_name" => $request->input("image_name"),
-        "user_id" => $request->input("user_id"),
-        "is_active" => $request->input("is_active"),
-        "most_popular" => $request->input("most_popular")
-    ]);
+Route::post("/v1/food-update/{id}", function (Request $request, $id) {
 
+    $project = DB::table("food")->where("id", $id)->first();
+
+    $image_path = public_path("/uploads/food/" . $project->image_name);
+
+    if ($request->hasFile('image_name')) {
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        }
+
+        $upload_path = base_path('./public');
+        $extension = $request->file("image_name")->getClientOriginalExtension();
+        $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+        $request->file("image_name")->move(
+            $upload_path . '/uploads/food',
+            $fileNameToStore
+        );
+
+        $dbfood = DB::table("food")->where("id", $id)->update([
+            "name" => $request->input("name"),
+            "price" => $request->input("price"),
+            "description" => $request->input("description"),
+            "rating" => $request->input("rating"),
+            "image_name" => $fileNameToStore,
+            "user_id" => $request->input("user_id"),
+            "is_active" => $request->input("is_active"),
+            "most_popular" => $request->input("most_popular")
+        ]);
+    }
     if ($dbfood == null) {
         return response()->json([
             "status" => 400,
@@ -414,9 +486,19 @@ Route::put("/v1/food-update/{id}", function (Request $request, $id) {
     }
 });
 
-//-- deleted
 Route::delete("/v1/food-delete/{id}", function (Request $request, $id) {
+    $project = DB::table("food")->where("id", $id)->first();
+
+    $image_path = public_path("/uploads/food/" . $project->image_name);
+
+    if ($project) {
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        }
+    }
+
     $dbfood = DB::table("food")->delete($id);
+
     if ($dbfood == null) {
         return response()->json([
             "status" => 400,
@@ -431,11 +513,10 @@ Route::delete("/v1/food-delete/{id}", function (Request $request, $id) {
         ], 200);
     }
 });
+// ? FOOD
 
-// -- MENU
-// - GET
-
-Route::get("v1/daftar-menu/get", function () {
+// ! Menu
+Route::get("v1/daftar-menu", function () {
     $dbmenu = DB::table("menu")->get();
     if ($dbmenu == null) {
         return response()->json([
@@ -453,8 +534,8 @@ Route::get("v1/daftar-menu/get", function () {
     }
 });
 
-route::get("v1/daftar-menu/{id}", function (request $request, $id) {
-    $dbmenu = DB::table("menu")->where("id", $id)->get();
+Route::get("v1/daftar-menu/{id}", function (request $request, $id) {
+    $dbmenu = DB::table("menu")->where("id", $id)->first();
     if ($dbmenu == null) {
         return response()->json([
             "status" => 400,
@@ -471,7 +552,7 @@ route::get("v1/daftar-menu/{id}", function (request $request, $id) {
     };
 });
 
-route::post("v1/daftar-menu/created/{id}", function (request $request, $id) {
+Route::post("/v1/daftar-menu/create", function (Request $request) {
     $dbmenu = DB::table("menu")->insert([
         "food_id"  => $request->input("food_id"),
         "drink_id" => $request->input("drink_id"),
@@ -481,18 +562,18 @@ route::post("v1/daftar-menu/created/{id}", function (request $request, $id) {
         return response()->json([
             "status" => 400,
             "error" => true,
-            "message" => "something went wrong"
+            "message" => "Something went wrong"
         ], 400);
     } else {
         return response()->json([
             "status" => 201,
             "error" => false,
-            "message" => "succesfully created menu by id"
+            "message" => "Succesfully created menu"
         ], 201);
     }
 });
-// UPDATED
-route::put("v1/daftar-menu/updated/{id}", function (request $request, $id) {
+
+Route::post("/v1/daftar-menu/update/{id}", function (request $request, $id) {
     $dbmenu = DB::table("menu")->where("id", $id)->update([
         "food_id" => $request->input("food_id"),
         "drink_id" => $request->input("drink_id"),
@@ -513,8 +594,7 @@ route::put("v1/daftar-menu/updated/{id}", function (request $request, $id) {
     };
 });
 
-// DELETED
-Route::delete("/v1/daftar-menu/deleted/{id}", function (Request $request, $id) {
+Route::delete("/v1/daftar-menu/delete/{id}", function (Request $request, $id) {
     $dbmenu = DB::table("menu")->delete($id);
     if ($dbmenu == null) {
         return response()->json([
@@ -530,6 +610,7 @@ Route::delete("/v1/daftar-menu/deleted/{id}", function (Request $request, $id) {
         ], 200);
     }
 });
+// ? === Menu
 
 
 // ! === Order Transaction
@@ -553,7 +634,7 @@ Route::get("/v1/order-transaction", function () {
 });
 
 Route::get("/v1/order-transaction/{id}", function (Request $request, $id) {
-    $dbOrderTransaction = DB::table("order_transaction")->where("id", $id)->get();
+    $dbOrderTransaction = DB::table("order_transaction")->where("id", $id)->first();
     if ($dbOrderTransaction == null) {
         return response()->json([
             "status" => 400,
@@ -778,7 +859,7 @@ Route::get("/v1/snack", function () {
 });
 
 Route::get("/v1/snack/{id}", function (Request $request, $id) {
-    $dbSnack = DB::table("snack")->where("id", $id)->get();
+    $dbSnack = DB::table("snack")->where("id", $id)->first();
     if ($dbSnack == null) {
         return response()->json([
             "status" => 400,
@@ -801,7 +882,7 @@ Route::post("/v1/snack/create", function (Request $request) {
     $extension = $request->file("image_name")->getClientOriginalExtension();
     $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
     $request->file("image_name")->move(
-        $upload_path . '/uploads/',
+        $upload_path . '/uploads/snack',
         $fileNameToStore
     );
 
@@ -833,24 +914,34 @@ Route::post("/v1/snack/create", function (Request $request) {
 
 Route::post("/v1/snack-update/{id}", function (Request $request, $id) {
 
-    $upload_path = base_path('./public');
-    $extension = $request->file("image_name")->getClientOriginalExtension();
-    $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
-    $request->file("image_name")->move(
-        $upload_path . '/uploads/',
-        $fileNameToStore
-    );
+    $project = DB::table("snack")->where("id", $id)->first();
 
-    $dbSnack = DB::table("snack")->where("id", $id)->update([
-        "name" => $request->input("name"),
-        "price" => $request->input("price"),
-        "desciption" => $request->input("description"),
-        "rating" => $request->input("rating"),
-        "image_name" => $fileNameToStore,
-        "user_id" => $request->input("user_id"),
-        "is_active" => $request->input("is_active"),
-        "most_popular" => $request->input("most_popular")
-    ]);
+    $image_path = public_path("/uploads/snack/" . $project->image_name);
+
+    if ($request->hasFile('image_name')) {
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        }
+
+        $upload_path = base_path('./public');
+        $extension = $request->file("image_name")->getClientOriginalExtension();
+        $fileNameToStore = 'redeem_' . uniqid() . '_' . time() . '.' . $extension;
+        $request->file("image_name")->move(
+            $upload_path . '/uploads/snack',
+            $fileNameToStore
+        );
+
+        $dbSnack = DB::table("snack")->where("id", $id)->update([
+            "name" => $request->input("name"),
+            "price" => $request->input("price"),
+            "description" => $request->input("description"),
+            "rating" => $request->input("rating"),
+            "image_name" => $fileNameToStore,
+            "user_id" => $request->input("user_id"),
+            "is_active" => $request->input("is_active"),
+            "most_popular" => $request->input("most_popular")
+        ]);
+    }
 
     if ($dbSnack == null) {
         return response()->json([
@@ -1105,7 +1196,7 @@ Route::get("/v1/transaction-history", function () {
 });
 
 Route::get("/v1/transaction-history/{id}", function (Request $request, $id) {
-    $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->get();
+    $dbTransactionHistory = DB::table("transaction_history")->where("id", $id)->first();
     if ($dbTransactionHistory == null) {
         return response()->json([
             "status" => 400,
@@ -1208,7 +1299,7 @@ Route::get("/v1/users", function () {
 });
 
 Route::get("/v1/user/{id}", function (Request $request, $id) {
-    $dbUsers = DB::table("users")->where("id", $id)->get();
+    $dbUsers = DB::table("users")->where("id", $id)->first();
     if ($dbUsers == null) {
         return response()->json([
             "status" => 400,
