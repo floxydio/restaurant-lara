@@ -659,7 +659,7 @@ Route::get("/v1/restaurant", function () {
 });
 
 Route::get("/v1/restaurant/{setting_name}", function (Request $request, $setting_name) {
-    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->get();
+    $dbResto = DB::table("restaurant_detail")->where("setting_name", $setting_name)->first();
     if ($dbResto == null) {
         return response()->json([
             "status" => 400,
@@ -909,7 +909,7 @@ Route::get("/v1/staff-call", function () {
 });
 
 Route::get("/v1/staff-call/{id}", function (Request $request, $id) {
-    $dbStaff = DB::table("staff_call")->where("id", $id)->get();
+    $dbStaff = DB::table("staff_call")->where("id", $id)->first();
     if ($dbStaff == null) {
         return response()->json([
             "status" => 400,
@@ -1008,7 +1008,7 @@ Route::get("/v1/table-order", function () {
 });
 
 Route::get("/v1/table-order/{id}", function (Request $request, $id) {
-    $dbTable = DB::table("table_order")->where("id", $id)->get();
+    $dbTable = DB::table("table_order")->where("id", $id)->first();
     if ($dbTable == null) {
         return response()->json([
             "status" => 400,
